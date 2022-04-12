@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define SIZE 20
+
+struct DataItem {
+   int data;   
+   int key;
+};
+
+int collision=0;
+
+struct DataItem* hashArray[SIZE]; 
+struct DataItem* dummyItem;
+struct DataItem* item;
+
+int hashCode(int key) {
+   return key % SIZE;
+}
+
+struct DataItem *search(int key) {
+   //get the hash 
+   int hashIndex = hashCode(key);  
+	
+   //move in array until an empty 
+   while(hashArray[hashIndex] != NULL) {
+	
+      if(hashArray[hashIndex]->key == key)
+         return hashArray[hashIndex]; 
+			
+      //go to next cell
+      ++hashIndex;
+		
+      //wrap around the table
+      hashIndex %= SIZE;
+   }        
+	
+   return NULL;        
+}
+
+void insert(int key,int data) {
+	
+	struct DataItem *item = (struct DataItem*) malloc(sizeof(struct DataItem));
+	item->data = data;  
+	item->key = key;
+	
+	//get the hash 
+	int hashIndex = hashCode(key);
+	
+	//move in array until an empty or deleted cell
+	while(hashArray[hashIndex] != NULL && hashArray[hashIndex]->key != -1) {
+	  //go to next cell
+	  ++hashIndex;
+		
+	  //wrap around the table
+	  hashIndex %= SIZE;
+	  ++collision;
+	}
+	
+	hashArray[hashIndex] = item;
+}
+
+void display() {
+   	int i = 0;
+	printf("\nHash table : ");
+   	for(i = 0; i<SIZE; i++) {
+	
+		if(hashArray[i] != NULL)
+		 printf("%d->(%d,%d) ",i,hashArray[i]->data,hashArray[i]->key);
+		else
+		 printf("%d->~~ ",i);
+   	}
+	
+   printf("\n");
+}
+
+int main() {
+	int key;
+	dummyItem = (struct DataItem*) malloc(sizeof(struct DataItem));
+	dummyItem->data = -1;  
+	dummyItem->key = -1; 
+	
+	insert(112, 12);
+	insert(130, 30);
+	insert(156, 56);
+	insert(173, 17);
+	insert(197, 19);
+	insert(150, 50);
+	insert(166, 66);
+	insert(113, 13);
+	insert(123, 12);
+	insert(143, 14);
+	insert(167, 16);
+	insert(189, 18);
+	insert(193, 19);
+	insert(117, 11);
+	insert(176, 76);
+	
+	display();
+
+	printf("\nNumber of collisions : %d\n",collision);
+
+	printf("\nEnter key to search : ");
+	scanf("%d",&key);
+	item = search(key);
+	
+	if(item != NULL) {
+		printf("\nInventory item : %d\n", item->key);
+		printf("\nQuantity : %d\n", item->data);
+	} else {
+		printf("\nElement not found\n");
+	}
+
+}
